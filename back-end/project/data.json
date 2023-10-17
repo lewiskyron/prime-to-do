@@ -1,0 +1,137 @@
+[
+    {
+        "list_name": "Shopping",
+        "tasks": [
+            {
+                "name": "Buy cheese",
+                "sub_tasks": [
+                    {
+                        "name": "Google cheeses"
+                    },
+                    {
+                        "name": "Compare prices"
+                    }
+                ]
+            },
+            {
+                "name": "Buy Detergent",
+                "sub_tasks": [
+                    {
+                        "name": "Compare brands"
+                    },
+                    {
+                        "name": "Check for discounts"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "list_name": "Meeting",
+        "tasks": [
+            {
+                "name": "Client meeting",
+                "sub_tasks": [
+                    {
+                        "name": "Prepare presentation"
+                    },
+                    {
+                        "name": "Review client notes"
+                    }
+                ]
+            },
+            {
+                "name": "Team standup",
+                "sub_tasks": [
+                    {
+                        "name": "Create agenda"
+                    },
+                    {
+                        "name": "Update project status"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "list_name": "Gym",
+        "tasks": [
+            {
+                "name": "Cardio workout",
+                "sub_tasks": [
+                    {
+                        "name": "Set workout duration"
+                    },
+                    {
+                        "name": "Monitor heart rate"
+                    }
+                ]
+            },
+            {
+                "name": "Strength training",
+                "sub_tasks": [
+                    {
+                        "name": "Choose exercises"
+                    },
+                    {
+                        "name": "Adjust weights"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "list_name": "Study",
+        "tasks": [
+            {
+                "name": "Read a chapter",
+                "sub_tasks": [
+                    {
+                        "name": "Take notes"
+                    },
+                    {
+                        "name": "Highlight key points"
+                    }
+                ]
+            },
+            {
+                "name": "Write an essay",
+                "sub_tasks": [
+                    {
+                        "name": "Research topic"
+                    },
+                    {
+                        "name": "Outline essay"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "list_name": "Cook Dinner",
+        "tasks": [
+            {
+                "name": "Prepare ingredients",
+                "sub_tasks": [
+                    {
+                        "name": "Chop vegetables"
+                    },
+                    {
+                        "name": "Marinate meat"
+                    }
+                ]
+            },
+            {
+                "name": "Cook a delicious meal",
+                "sub_tasks": [
+                    {
+                        "name": "Follow recipe"
+                    },
+                    {
+                        "name": "Plate and garnish"
+                    }
+                ]
+            }
+        ]
+    }
+]
