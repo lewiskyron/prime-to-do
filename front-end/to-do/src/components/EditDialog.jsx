@@ -10,20 +10,40 @@ import {
     StyledDialogContent, 
     StyledTextField 
 } from '../components/comp-styles.jsx'; 
+import { useApi } from "../contexts/ApiProvier.jsx";
 
 
-export default function EditDialog({ open, handleClose, title }) {
+export default function EditDialog({ open, handleClose, listId, fetchData }) {
     const [text, setText] = useState("");
 
     const handleTextChange = (event) => {
         setText(event.target.value);
     };
+    const api = useApi();
 
-    const handleSave = () => {
+    async function handleSave(){
         // Do something with the text value
-        console.log(text);
+        const updatedListData = {
+            name: text
+        };
+        try {
+            console.log("currentList: ", )
+            const response = await api.put(`/EditList/${listId}`, updatedListData);
+        
+            if (response.ok) {
+              console.log("List updated successfully!", response.body);
+              fetchData();  // Refresh the lists after updating
+              handleClose();
+            } else {
+              console.error("Error updating list:", response.body.message);
+            }
+          } catch (error) {
+            console.error("Failed to update list:", error);
+          }
         handleClose();
     };
+
+
 
     return (
         <StyledDialog open={open} onClose={handleClose}>

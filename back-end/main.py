@@ -35,3 +35,33 @@ def add_list():
     db.session.add(new_list)
     db.session.commit()
     return jsonify({"message": "List added successfully!"}), 200
+
+
+@main.route("/DeleteList/<int:list_id>", methods=["DELETE"])
+def delete_list(list_id):
+    list_to_delete = List.query.filter_by(id=list_id).first()
+
+    if not list_to_delete:
+        return jsonify({"message": "List not found!"}), 404
+
+    db.session.delete(list_to_delete)
+    db.session.commit()
+    return jsonify({"message": "List deleted successfully!"}), 200
+
+
+@main.route("/EditList/<int:list_id>", methods=["PUT"])
+def edit_list(list_id):
+    data = request.get_json()
+    list_to_edit = List.query.filter_by(id=list_id).first()
+
+    if not list_to_edit:
+        return jsonify({"message": "List not found!"}), 404
+
+    # Assuming 'name' is a property of the list you want to edit
+    if 'name' in data:
+        list_to_edit.name = data['name']
+
+    # Add more fields to update as needed
+
+    db.session.commit()
+    return jsonify({"message": "List updated successfully!"}), 200

@@ -5,15 +5,11 @@ import ListDialog from './ListDialog';
 
 
 export default function Navbar() {
-    const [user, setUser] = useState({ name: 'Kyron!' });
-    const [tasks, setTasks] = useState([]);
-
-
     return (
         <>
             <nav>
                 <div className="nav-left">
-                    <span>Welcome, {user.name}</span>
+                    <span>Welcome</span>
                 </div>
 
                 <div className="nav-right">

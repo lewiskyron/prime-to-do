@@ -17,6 +17,7 @@ export default function Lists() {
   const [isDialogOpen, CreateDialogOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentList, setCurrentList] = useState(toDoLists);
+  const [currentListId, setCurrentListId] = useState(null);
 
   const api = useApi();
   const navigate = useNavigate();
@@ -37,6 +38,24 @@ export default function Lists() {
     }
   };
 
+  const handleDelete = async (e, listId) => {
+    e.stopPropagation(); // Prevent triggering any parent onClick handlers
+  
+    try {
+      const response = await api.delete(`/DeleteList/${listId}`);
+  
+      if (response.ok) {
+        console.log("List deleted successfully!", response.body);
+        fetchData();  // Call fetchData after successfully deleting the list
+        onClose();
+      } else {
+        console.error("Error deleting list:", response.body.message);
+      }
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+    }
+  };
+  
   // Effects
   useEffect(() => {
     fetchData();
@@ -45,12 +64,13 @@ export default function Lists() {
   const handleAddList = () => CreateDialogOpen(true);
   const handleCloseDialog = () => CreateDialogOpen(false);
   const navigateToTask = () => navigate("/tasks");
-  const handleEdit = (e) => {
+  const handleEdit = (e, listId, listName) => {
     e.stopPropagation();
+    setCurrentListId(listId); // Store the listId
+    setCurrentList(listName); // Store the listName
     setDialogOpen(true);
   };
   const closeDialog = () => setDialogOpen(false);
-  const handleDelete = (e) => e.stopPropagation();
 
   return (
     <>
@@ -62,10 +82,10 @@ export default function Lists() {
             {toDoLists.lists && toDoLists.lists.map((list) => (
               <Item key={list.id} onClick={navigateToTask}>
                 {list.name}
-                <IconButton onClick={handleEdit} size="small" style={{ position: "absolute", right: "50px", top: "50%", transform: "translateY(-50%)" }}>
+                <IconButton onClick={(e) => handleEdit(e, list.id, list.name)} size="small" style={{ position: "absolute", right: "50px", top: "50%", transform: "translateY(-50%)" }}>
                   <EditIcon fontSize="inherit" />
                 </IconButton>
-                <IconButton onClick={handleDelete} size="small" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)" }}>
+                <IconButton onClick={(e) => handleDelete(e, list.id)} size="small" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)" }}>
                   <DeleteIcon fontSize="inherit" />
                 </IconButton>
               </Item>
@@ -76,7 +96,7 @@ export default function Lists() {
           </div>
         </MainContainer>
       )}
-      {currentList && <EditDialog open={dialogOpen} handleClose={closeDialog} title={currentList.title} fetchData={fetchData} />}
+      {currentList && <EditDialog open={dialogOpen} handleClose={closeDialog} fetchData={fetchData} listId={currentListId} />}
       {isDialogOpen && <ListDialog open={isDialogOpen} onClose={handleCloseDialog} fetchData={fetchData} />}
     </>
   );
