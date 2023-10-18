@@ -12,8 +12,9 @@ import {
 } from "../components/comp-styles.jsx";
 import { useApi } from "../contexts/ApiProvier.jsx";
 
-export default function ListDialog({ onClose, open }) {
+export default function ListDialog({ onClose, open , fetchData}) {
   const [text, setText] = useState("");
+  
 
   const handleTextChange = (e) => {
     setText(e.target.value);
@@ -35,7 +36,7 @@ export default function ListDialog({ onClose, open }) {
         // Handle successful response, e.g., show a success message or update the UI
         console.log("List added successfully!", response.body);
         
-
+        fetchData();
         // Close the dialog or perform cleanup
         onClose();
       } else {
