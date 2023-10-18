@@ -78,3 +78,9 @@ footer {
 .user-profile {
   margin-right: 25px; /* Add margin to the right of the span */
 }
+
+.Accordian_background{
+  background-color: #f5f7fa; 
+  height: 100vh;
+  margin-top: 0%;
+}

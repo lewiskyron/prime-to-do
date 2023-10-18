@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Tasks from "./pages/Tasks.jsx";
+import TasksPage from "./pages/TasksPage.jsx";
 import Home from "./pages/Home.jsx";
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -16,7 +16,7 @@ export default function App() {
       <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks" element={<TasksPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
