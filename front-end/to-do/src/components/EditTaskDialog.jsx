@@ -25,19 +25,7 @@ const EditTaskDialog = ({ open, handleClose, fetchData, task }) => {
   const [taskName, setTaskName] = useState("");
   const api = useApi();
 
-  useEffect(() => {
-    if (task) {
-      setTaskName(task.name || "");
-    } else {
-      setTaskName("");
-    }
-  }, [task]);
-
-
-
-
   
-
   const handleSave = async () => {
     try {
       // Assuming the API endpoint to update the task
@@ -60,6 +48,14 @@ const EditTaskDialog = ({ open, handleClose, fetchData, task }) => {
         setTaskName(e.target.value);
 
     }
+
+    useEffect(() => {
+        if (task) {
+          setTaskName(task.name || "");
+        } else {
+          setTaskName("");
+        }
+      }, [task]);
 
   return (
     <StyledDialog open={open} onClose={handleClose} fullWidth>

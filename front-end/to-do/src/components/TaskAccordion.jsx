@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
-
+import AddIcon from "@mui/icons-material/Add";
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   width: "80%",
@@ -23,7 +23,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
   },
 }));
 
-const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange }) => {
+const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange, onAdd}) => {
   return (
     <StyledAccordion>
       <AccordionSummary
@@ -44,6 +44,16 @@ const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange }) => {
         >
           {task.name}
         </Typography>
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            onAdd(task);
+          }}
+          color="primary"
+          aria-label="Add Subtask"
+        >
+          <AddIcon />
+        </IconButton>
         <IconButton
           onClick={(e) => onEdit(task, e)}
           color="primary"
@@ -69,6 +79,7 @@ const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange }) => {
               onEdit={onEdit}
               onDelete={onDelete}
               onCheckboxChange={onCheckboxChange}
+              onAdd={onAdd}
             />
           ))}
       </AccordionDetails>

@@ -12,14 +12,16 @@ import Box from "@mui/material/Box";
 import TaskAccordion from "./TaskAccordion.jsx"; // Import TaskAccordion component
 import EditTaskDialog from "./EditTaskDialog.jsx"; // Import EditTaskDialog component
 import DeleteTaskDialog from "./DeleteTaskDialog.jsx"; // Import DeleteTaskDialog component
+import AddSubTaskDialog from "./AddSubTaskDialog.jsx"; // Import AddSubTaskDialog component
 
 export default function Tasks({ listID }) {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState("");
   const [isEditTaskDialogOpen, setIsEditTaskDialogOpen] = useState(false);
-  const [currentTask, setCurrentTask] = useState(tasks);
-  const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState(null);
   const [isDeleteTaskDialogOpen, setIsDeleteTaskDialogOpen] = useState(false);
+  const [isAddSubtaskDialogOpen, setIsAddSubtaskDialogOpen] = useState(false);
+  const [parentTaskId, setParentTaskId] = useState(null);
 
   const api = useApi();
 
@@ -65,8 +67,6 @@ export default function Tasks({ listID }) {
     fetchTasks();
   }, []);
 
-
-
   const handleTaskNameChange = (e) => {
     setNewTaskName(e.target.value);
   };
@@ -75,7 +75,7 @@ export default function Tasks({ listID }) {
     e.stopPropagation();
   };
 
-  const handleEditClick = async (task,e) => {
+  const handleEditClick = async (task, e) => {
     e.stopPropagation();
     setCurrentTask(task);
     setIsEditTaskDialogOpen(true);
@@ -83,7 +83,7 @@ export default function Tasks({ listID }) {
 
   const handleDeleteClick = (task, e) => {
     e.stopPropagation();
-    setCurrentTask(task)
+    setCurrentTask(task);
     setIsDeleteTaskDialogOpen(true);
   };
 
@@ -92,7 +92,7 @@ export default function Tasks({ listID }) {
       console.log(`Deleting task with ID ${taskId}`);
       const response = await api.delete(`/DeleteTask/${taskId}`);
       if (response.ok) {
-        fetchTasks();  // Re-fetch tasks to update the list after deletion
+        fetchTasks(); // Re-fetch tasks to update the list after deletion
         console.log("Task deleted successfully!");
       } else {
         throw new Error(response.body.message);
@@ -103,10 +103,43 @@ export default function Tasks({ listID }) {
     setIsDeleteTaskDialogOpen(false);
   };
 
-
   const handleAddTask = async (e) => {
     e.preventDefault();
     postTasks(newTaskName, listID);
+  };
+
+  const handleAddSubtaskClick = (task) => {
+    console.log("Add subtask clicked for task:", task.id)
+    setParentTaskId(task.id);
+    setIsAddSubtaskDialogOpen(true);
+  };
+
+  const handleAddSubtask = async (subtaskName) => {
+    try {
+      if (!subtaskName.trim()) {
+        alert("Please enter a valid subtask name!");
+        return;
+      }
+
+      const response = await api.post("/AddSubtasks", {
+        name: subtaskName,
+        parent_id: parentTaskId,
+        list_id: listID, // Assuming listID is available in your component's scope
+      });
+
+      if (response.ok) {
+        fetchTasks(); // Assuming you have a function to refresh the list of tasks
+        console.log("Subtask added successfully!");
+      } else {
+        // Handle the error according to your API response structure
+        throw new Error(response.body.message || "Error adding subtask");
+      }
+    } catch (error) {
+      console.error("Failed to add subtask:", error);
+      alert("Failed to add subtask: " + error.message);
+    } finally {
+      setIsAddSubtaskDialogOpen(false); // Close the dialog in any case
+    }
   };
 
   return (
@@ -153,6 +186,7 @@ export default function Tasks({ listID }) {
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
               onCheckboxChange={handleCheckboxChange}
+              onAdd={handleAddSubtaskClick}
             />
           ))}
       {currentTask && (
@@ -171,6 +205,13 @@ export default function Tasks({ listID }) {
           />
         </>
       )}
+
+      <AddSubTaskDialog
+        open={isAddSubtaskDialogOpen}
+        onClose={() => setIsAddSubtaskDialogOpen(false)}
+        onAdd={handleAddSubtask}
+      />
     </MainContainer>
   );
 }
+  
