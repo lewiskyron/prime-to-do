@@ -20,6 +20,7 @@ export default class TodoApiClient {
           'Content-Type': 'application/json',
           ...options.headers,
         },
+        credentials: "include",
         body: options.body ? JSON.stringify(options.body) : null,
       });
     }

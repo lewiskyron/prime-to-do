@@ -10,11 +10,10 @@ import {
   StyledDialogContent,
   StyledTextField,
 } from "../components/comp-styles.jsx";
-import { useApi } from "../contexts/ApiProvier.jsx";
+import { useApi } from "../contexts/ApiProvider.jsx";
 
-export default function ListDialog({ onClose, open , fetchData}) {
+export default function ListDialog({ onClose, open, fetchData, user_id }) {
   const [text, setText] = useState("");
-  
 
   const handleTextChange = (e) => {
     setText(e.target.value);
@@ -24,7 +23,7 @@ export default function ListDialog({ onClose, open , fetchData}) {
 
   const listData = {
     name: text,
-    user_id: 0,
+    user_id: user_id,
   };
 
   async function handleSave() {
@@ -35,7 +34,7 @@ export default function ListDialog({ onClose, open , fetchData}) {
       if (response.ok) {
         // Handle successful response, e.g., show a success message or update the UI
         console.log("List added successfully!", response.body);
-        
+
         fetchData();
         // Close the dialog or perform cleanup
         onClose();

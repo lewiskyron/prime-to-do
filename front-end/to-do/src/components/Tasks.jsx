@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useApi } from "../contexts/ApiProvier.jsx";
+import { useApi } from "../contexts/ApiProvider.jsx";
 import Typography from "@mui/material/Typography";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -109,7 +109,7 @@ export default function Tasks({ listID }) {
   };
 
   const handleAddSubtaskClick = (task) => {
-    console.log("Add subtask clicked for task:", task.id)
+    console.log("Add subtask clicked for task:", task.id);
     setParentTaskId(task.id);
     setIsAddSubtaskDialogOpen(true);
   };
@@ -214,4 +214,3 @@ export default function Tasks({ listID }) {
     </MainContainer>
   );
 }
-  

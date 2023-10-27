@@ -6,10 +6,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { MainContainer, Item } from "./comp-styles";
 import EditDialog from "./EditDialog";
-import ListDialog from './ListDialog';
-import { useApi } from "../contexts/ApiProvier.jsx";
+import ListDialog from "./ListDialog";
+import { useApi } from "../contexts/ApiProvider.jsx";
 
-export default function Lists() {
+export default function Lists({ userID }) {
   // State
   const [toDoLists, setToDoLists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +24,8 @@ export default function Lists() {
 
   const fetchData = async () => {
     try {
-      const response = await api.get("/GetLists");
-      
+      const response = await api.get(`/GetLists?userID=${userID}`); // Filter lists by userID
+
       if (response.ok) {
         setToDoLists(response.body);
       } else {
@@ -40,13 +40,13 @@ export default function Lists() {
 
   const handleDelete = async (e, listId) => {
     e.stopPropagation(); // Prevent triggering any parent onClick handlers
-  
+
     try {
       const response = await api.delete(`/DeleteList/${listId}`);
-  
+
       if (response.ok) {
         console.log("List deleted successfully!", response.body);
-        fetchData();  // Call fetchData after successfully deleting the list
+        fetchData(); // Call fetchData after successfully deleting the list
         onClose();
       } else {
         console.error("Error deleting list:", response.body.message);
@@ -55,11 +55,12 @@ export default function Lists() {
       console.error("Failed to delete list:", error);
     }
   };
-  
+
   // Effects
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userID]); // Refetch data when userID changes
+
   // Handlers
   const handleAddList = () => CreateDialogOpen(true);
   const handleCloseDialog = () => CreateDialogOpen(false);
@@ -79,26 +80,58 @@ export default function Lists() {
       {!loading && !error && (
         <MainContainer>
           <Stack spacing={2}>
-            {toDoLists.lists && toDoLists.lists.map((list) => (
-              <Item key={list.id} onClick={() => navigateToTask(list.id)}>
-                {list.name}
-                <IconButton onClick={(e) => handleEdit(e, list.id, list.name)} size="small" style={{ position: "absolute", right: "50px", top: "50%", transform: "translateY(-50%)" }}>
-                  <EditIcon fontSize="inherit" />
-                </IconButton>
-                <IconButton onClick={(e) => handleDelete(e, list.id)} size="small" style={{ position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)" }}>
-                  <DeleteIcon fontSize="inherit" />
-                </IconButton>
-              </Item>
-            ))}
+            {toDoLists.lists &&
+              toDoLists.lists.map((list) => (
+                <Item key={list.id} onClick={() => navigateToTask(list.id)}>
+                  {list.name}
+                  <IconButton
+                    onClick={(e) => handleEdit(e, list.id, list.name)}
+                    size="small"
+                    style={{
+                      position: "absolute",
+                      right: "50px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <EditIcon fontSize="inherit" />
+                  </IconButton>
+                  <IconButton
+                    onClick={(e) => handleDelete(e, list.id)}
+                    size="small"
+                    style={{
+                      position: "absolute",
+                      right: "15px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <DeleteIcon fontSize="inherit" />
+                  </IconButton>
+                </Item>
+              ))}
           </Stack>
           <div className="nav-center">
             <button onClick={handleAddList}>Add List</button>
           </div>
         </MainContainer>
       )}
-      {currentList && <EditDialog open={dialogOpen} handleClose={closeDialog} fetchData={fetchData} listId={currentListId} />}
-      {isDialogOpen && <ListDialog open={isDialogOpen} onClose={handleCloseDialog} fetchData={fetchData} />}
-      {}
+      {currentList && (
+        <EditDialog
+          open={dialogOpen}
+          handleClose={closeDialog}
+          fetchData={fetchData}
+          listId={currentListId}
+        />
+      )}
+      {isDialogOpen && (
+        <ListDialog
+          open={isDialogOpen}
+          onClose={handleCloseDialog}
+          fetchData={fetchData}
+          user_id={userID}
+        />
+      )}
     </>
   );
 }

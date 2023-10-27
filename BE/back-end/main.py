@@ -1,29 +1,50 @@
 from flask import blueprints
-from models import List, Task # noqa
+from models import List, Task, User # noqa
 from flask import jsonify, request
 from db_init import db
 
 main = blueprints.Blueprint("main", __name__)
 
 
-@main.route("/")
-def home():
-    return "Welcome Home"
+@main.route("/users", methods=["GET"])
+def get_user_by_username():
+    try:
+        # Get the username from the query parameters
+        username = request.args.get("username")
 
+        # Query the database for the user based on the provided username
+        user = User.query.filter_by(username=username).first()
 
-@main.route("/about")
-def about():
-    return "About Us"
+        if user:
+            # If the user is found, return their information as JSON
+            return jsonify({
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                # Add any other user-related information you need here
+            }), 200
+        else:
+            # If the user is not found, return an error message
+            return jsonify({"message": "User not found"}), 404
+
+    except Exception as e:
+        # Handle any exceptions or errors
+        return jsonify({"message": f"Error: {str(e)}"}), 500
 
 
 @main.route("/GetLists", methods=["GET"])
 def get_lists():
-    success_message = "Successfully retrieved all lists from the database."
-    failure_message = "Failed to retrieve all lists from the database."
+    success_message = "Successfully retrieved user's lists from the database."
+    failure_message = "Failed to retrieve user's lists from the database."
     success_status = 200
+
+    # Get the userID from the query parameters
+    user_id = request.args.get("userID")
+
     try:
-        lists = List.query.all()
-        print("User retrieved all lists from the database")
+        # Filter lists by user_id
+        lists = List.query.filter_by(user_id=user_id).all()
+        print(f"User {user_id} retrieved their lists from the database")
         return (
             jsonify(
                 {
@@ -33,9 +54,8 @@ def get_lists():
             ),
             success_status,
         )
-        # Log the exception for debugging
     except Exception as e:
-        return jsonify({"message": f"{failure_message}. error is {e}"}), 400
+        return jsonify({"message": f"{failure_message}. Error is {e}"}), 400
 
 
 @main.route("/Addlists", methods=["POST"])

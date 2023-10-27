@@ -4,14 +4,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button
+  Button,
 } from "@mui/material";
 import {
   StyledDialog,
   StyledDialogContent,
-  StyledTextField
-} from '../components/comp-styles.jsx';
-import { useApi } from "../contexts/ApiProvier.jsx";
+  StyledTextField,
+} from "../components/comp-styles.jsx";
+import { useApi } from "../contexts/ApiProvider.jsx";
 
 export default function EditDialog({ open, handleClose, listId, fetchData }) {
   const [text, setText] = useState("");
@@ -23,7 +23,7 @@ export default function EditDialog({ open, handleClose, listId, fetchData }) {
 
   const handleSave = async () => {
     const updatedListData = {
-      name: text
+      name: text,
     };
 
     try {
