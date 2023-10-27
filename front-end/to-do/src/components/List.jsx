@@ -63,7 +63,7 @@ export default function Lists() {
   // Handlers
   const handleAddList = () => CreateDialogOpen(true);
   const handleCloseDialog = () => CreateDialogOpen(false);
-  const navigateToTask = () => navigate("/tasks");
+  const navigateToTask = (id) => navigate(`/tasks/${id}`);
   const handleEdit = (e, listId, listName) => {
     e.stopPropagation();
     setCurrentListId(listId); // Store the listId
@@ -80,7 +80,7 @@ export default function Lists() {
         <MainContainer>
           <Stack spacing={2}>
             {toDoLists.lists && toDoLists.lists.map((list) => (
-              <Item key={list.id} onClick={navigateToTask}>
+              <Item key={list.id} onClick={() => navigateToTask(list.id)}>
                 {list.name}
                 <IconButton onClick={(e) => handleEdit(e, list.id, list.name)} size="small" style={{ position: "absolute", right: "50px", top: "50%", transform: "translateY(-50%)" }}>
                   <EditIcon fontSize="inherit" />
@@ -98,6 +98,7 @@ export default function Lists() {
       )}
       {currentList && <EditDialog open={dialogOpen} handleClose={closeDialog} fetchData={fetchData} listId={currentListId} />}
       {isDialogOpen && <ListDialog open={isDialogOpen} onClose={handleCloseDialog} fetchData={fetchData} />}
+      {}
     </>
   );
 }

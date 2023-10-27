@@ -14,6 +14,13 @@ class List(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     tasks = db.relationship("Task", backref="list", lazy=True)
 
+    def to_dict(self):
+    
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
+    
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +29,7 @@ class Task(db.Model):
     list_id = db.Column(db.Integer, db.ForeignKey("list.id"), nullable=True)
     subtasks = db.relationship("Task", backref=db.backref("parent", remote_side=[id]))# noqa
     depth = db.Column(db.Integer, nullable=False, default=0)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
 
     def calculate_depth(self):
         def calculate_depth_recursive(task):
@@ -36,8 +44,13 @@ class Task(db.Model):
         else:
             return 0
 
-
-# @event.listens_for(Task, 'before_insert')
-# def calculate_and_set_depth(mapper, connection, target):
-#     # Calculate and set the depth before inserting into the database
-#     target.depth = target.calculate_depth()
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "parent_id": self.parent_id,
+            "list_id": self.list_id,
+            "depth": self.depth,
+            "completed": self.completed,
+            "subtasks": [subtask.to_dict() for subtask in self.subtasks],
+        }

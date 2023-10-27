@@ -1,6 +1,6 @@
 from flask import blueprints
 from models import List, Task # noqa
-from flask import jsonify, request, make_response
+from flask import jsonify, request
 from db_init import db
 
 main = blueprints.Blueprint("main", __name__)
@@ -18,14 +18,24 @@ def about():
 
 @main.route("/GetLists", methods=["GET"])
 def get_lists():
+    success_message = "Successfully retrieved all lists from the database."
+    failure_message = "Failed to retrieve all lists from the database."
+    success_status = 200
     try:
         lists = List.query.all()
-        output = [{"id": list.id, "name": list.name, "user_id": list.user_id, "tasks": list.tasks} for list in lists]  # noqa
-        return jsonify({"lists": output}), 200
-    except Exception as e:
+        print("User retrieved all lists from the database")
+        return (
+            jsonify(
+                {
+                    "message": success_message,
+                    "lists": [list.to_dict() for list in lists],
+                }
+            ),
+            success_status,
+        )
         # Log the exception for debugging
-        print(str(e))
-        return make_response(jsonify({"error": "An error occurred while fetching the lists."}), 500)  # noqa
+    except Exception as e:
+        return jsonify({"message": f"{failure_message}. error is {e}"}), 400
 
 
 @main.route("/Addlists", methods=["POST"])

@@ -16,7 +16,7 @@ export default function App() {
       <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/tasks/:id" element={<TasksPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
