@@ -3,7 +3,7 @@ html, body {
   padding: 0;
   height: 100vh;
   width: 100vw;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Didact Gothic', sans-serif;
   background-color: white; /*  Dark background color */
   color:black; /* White text color for contrast */
   overflow: auto;
@@ -28,11 +28,13 @@ nav {
 .nav-left {
   display: flex;
   align-items: center;
+  margin-left: 2%;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
+  margin-right: 2%;
 }
 
 button {
@@ -84,3 +86,5 @@ footer {
   height: 100vh;
   margin-top: 0%;
 }
+
+

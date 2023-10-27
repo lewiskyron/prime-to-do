@@ -38,11 +38,10 @@ const SignUpPage = () => {
         // Handle errors (e.g., show error message)
       }
     } catch (error) {
-      console.error('Request failed', error);
+      console.error("Request failed", error);
       // Handle network errors
     }
   };
-
 
   return (
     <Box
@@ -51,7 +50,7 @@ const SignUpPage = () => {
       alignItems="center"
       justifyContent="center"
       style={{
-        background: "#f5f7fa",
+        background: "linear-gradient(to bottom, #0F3443, #34E89E)", 
         boxShadow: "0px 0px 15px rgba(0,0,0,0.1)",
         fontFamily: "'Didact Gothic', sans-serif",
       }}
@@ -65,10 +64,20 @@ const SignUpPage = () => {
         justifyContent="center"
         padding={4}
       >
-        <Typography variant="h4" gutterBottom>
-          Prime To-Do
+        <Typography
+          variant="h4"
+          gutterBottom
+          style={{
+            fontFamily: "'Didact Gothic', sans-serif",
+            fontSize: "45px",
+            color: "#333",
+            fontWeight: "bold",
+
+          }}
+        >
+          Prime ToDo
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body1" style={{ fontSize: "20px", color: "#666" }}>
           Your ultimate to-do list manager.
         </Typography>
       </Box>
@@ -122,7 +131,12 @@ const SignUpPage = () => {
             variant="contained"
             color="primary"
             size="large"
-            style={{ marginTop: 16 }}
+            style={{
+              marginTop: 16,
+              backgroundColor: "#0F3443", // Button background color
+              color: "#fff", // Button text color
+              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)", // Button shadow
+            }}
             type="submit"
           >
             Create Account
