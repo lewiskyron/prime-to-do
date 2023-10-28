@@ -73,4 +73,3 @@ These endpoints focus on managing tasks and their hierarchical subtasks.
 #### **PUT** `/api/task/<task_id>/move`
 - **Description**: Moves a task to a different list.
 - **Auth Required**: Yes
-

@@ -40,13 +40,11 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 
 
     const handleEditClick = (taskId,e) => {
-        // Implement your edit functionality here
         e.stopPropagation();
         console.log(`Edit task with ID ${taskId}`);
     };
 
     const handleDeleteClick = (taskId,e) => {
-        // Implement your delete functionality here
         e.stopPropagation();
         console.log(`Delete task with ID ${taskId}`);
     };
