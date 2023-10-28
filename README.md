@@ -31,7 +31,14 @@ These instructions will get you a copy of the project up and running on your loc
 ```
 
 2. **create and activate a virtual environment:**
+
+    **For Windows**
+    ```bash
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
     
+    **For Mac**
     ```bash
     python -m venv venv
     source venv/bin/activate
@@ -73,6 +80,10 @@ These instructions will get you a copy of the project up and running on your loc
     ```bash
        cd BE
     ```
+    ```bash
+       cd back-end
+    ```
+
     ```bash
         python server.py
     ```
