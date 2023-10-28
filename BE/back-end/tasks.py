@@ -10,6 +10,17 @@ tasks = blueprints.Blueprint("tasks", __name__)
 @tasks.route("/GetTasks/<int:list_id>", methods=["GET"])
 @login_required
 def get_tasks(list_id):
+    """
+    Retrieve all tasks associated with a given list ID.
+
+    Args:
+        list_id (int): The ID of the list to retrieve tasks for.
+
+    Returns:
+        A tuple containing a JSON response with a success message and a list of dictionaries
+        containing all attributes of each task and a list of subtasks for each task, and a success status code.
+        If an error occurs, a JSON response with an error message and a 500 status code is returned.
+    """
     try:
         tasks = Task.query.filter_by(list_id=list_id).all()
         success_message = "Successfully retrieved all lists from the database."
@@ -39,6 +50,15 @@ def get_tasks(list_id):
 @tasks.route("/AddTask/<int:list_id>", methods=["POST"])
 @login_required
 def add_task(list_id):
+    """
+    Add a new task to a specified to-do list.
+
+    Args:
+        list_id (int): The ID of the to-do list to add the task to.
+
+    Returns:
+        A JSON response containing a success message or an error message if the request fails.
+    """
     try:
         data = request.json  # Parse JSON data from the request body
         task_name = data.get("name")
@@ -63,6 +83,21 @@ def add_task(list_id):
 @tasks.route("/AddSubtasks", methods=["POST"])
 @login_required
 def add_subtask():
+    """
+    Add a subtask to an existing task.
+
+    The function expects a JSON payload with the following keys:
+    - parent_id: The ID of the parent task.
+    - name: The name of the subtask.
+    - list_id: The ID of the list to which the subtask belongs.
+
+    If the parent_id is not provided or is invalid, the function returns a 400 error.
+    If the parent task is not found, the function returns a 404 error.
+    If the subtask is added successfully, the function returns a 200 status code.
+    If an error occurs, the function returns a 500 error.
+
+    :return: A JSON response with a message or error.
+    """
     try:
         data = request.json  # Parse JSON data from the request body
         parent_id = data.get("parent_id")  # Replace with the key for the
@@ -168,6 +203,19 @@ def task_completed(task_id):
 @tasks.route("/getUserIdByListId/<int:list_id>", methods=["GET"])
 @login_required
 def get_user_id_by_list_id(list_id):
+    """
+    Returns the user ID associated with a given list ID.
+
+    Args:
+        list_id (int): The ID of the list to retrieve the user ID for.
+
+    Returns:
+        A JSON object containing the user ID associated with the given list ID.
+
+    Raises:
+        404: If the list with the given ID is not found.
+        500: If an error occurs while retrieving the user ID.
+    """
     try:
         # Assuming that the List model has a 'user_id' attribute
         list = List.query.get(list_id)
@@ -185,6 +233,16 @@ def get_user_id_by_list_id(list_id):
 @tasks.route("/moveTask/<int:task_id>", methods=["PUT"])
 @login_required
 def move_task_with_subtasks(task_id):
+    """
+    Move a task and its subtasks to a new list.
+
+    Args:
+        task_id (int): The ID of the task to be moved.
+
+    Returns:
+        A JSON response containing a message indicating whether the task and its subtasks were moved successfully,
+        or an error message if an error occurred.
+    """
     try:
         new_list_data = request.json
         new_list_id = new_list_data.get("new_list_id")
