@@ -59,11 +59,11 @@ def login():
 
 
 @auth_bp.route("/logout", methods=["POST"])
-@login_required
 def logout():
     try:
         print(f"User {current_user.username} logged out successfully!")
         logout_user()
         return jsonify({"message": "Logged out successfully!"}), 200
     except Exception as e:
+        print(f"Error logging out: {e}")
         return jsonify({"message": f"Error logging out: {e}"}), 400

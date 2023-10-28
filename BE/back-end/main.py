@@ -2,44 +2,19 @@ from flask import blueprints
 from models import List, Task, User # noqa
 from flask import jsonify, request
 from db_init import db
+from flask_login import current_user, login_required  # noqa
 
 main = blueprints.Blueprint("main", __name__)
 
 
-@main.route("/users", methods=["GET"])
-def get_user_by_username():
-    try:
-        # Get the username from the query parameters
-        username = request.args.get("username")
-
-        # Query the database for the user based on the provided username
-        user = User.query.filter_by(username=username).first()
-
-        if user:
-            # If the user is found, return their information as JSON
-            return jsonify({
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                # Add any other user-related information you need here
-            }), 200
-        else:
-            # If the user is not found, return an error message
-            return jsonify({"message": "User not found"}), 404
-
-    except Exception as e:
-        # Handle any exceptions or errors
-        return jsonify({"message": f"Error: {str(e)}"}), 500
-
-
 @main.route("/GetLists", methods=["GET"])
+@login_required
 def get_lists():
     success_message = "Successfully retrieved user's lists from the database."
     failure_message = "Failed to retrieve user's lists from the database."
     success_status = 200
 
-    # Get the userID from the query parameters
-    user_id = request.args.get("userID")
+    user_id = current_user.id
 
     try:
         # Filter lists by user_id
@@ -59,15 +34,17 @@ def get_lists():
 
 
 @main.route("/Addlists", methods=["POST"])
+@login_required
 def add_list():
     data = request.get_json()
-    new_list = List(name=data["name"], user_id=data["user_id"])
+    new_list = List(name=data["name"], user_id=current_user.id)
     db.session.add(new_list)
     db.session.commit()
     return jsonify({"message": "List added successfully!"}), 200
 
 
 @main.route("/DeleteList/<int:list_id>", methods=["DELETE"])
+@login_required
 def delete_list(list_id):
     list_to_delete = List.query.filter_by(id=list_id).first()
 
@@ -80,6 +57,7 @@ def delete_list(list_id):
 
 
 @main.route("/EditList/<int:list_id>", methods=["PUT"])
+@login_required
 def edit_list(list_id):
     data = request.get_json()
     list_to_edit = List.query.filter_by(id=list_id).first()
@@ -95,6 +73,3 @@ def edit_list(list_id):
 
     db.session.commit()
     return jsonify({"message": "List updated successfully!"}), 200
-
-
-

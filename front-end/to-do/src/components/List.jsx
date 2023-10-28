@@ -8,7 +8,7 @@ import { MainContainer, Item } from "./comp-styles";
 import EditDialog from "./EditDialog";
 import { useApi } from "../contexts/ApiProvider.jsx";
 
-export default function Lists({ userID }) {
+export default function Lists() {
   // State
   const [toDoLists, setToDoLists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ export default function Lists({ userID }) {
   const fetchData = async () => {
     setLoading(true); // Start loading
     try {
-      const response = await api.get(`/GetLists?userID=${userID}`); // Filter lists by userID
+      const response = await api.get(`/GetLists`); 
 
       if (response.ok) {
         setToDoLists(response.body);
@@ -58,7 +58,6 @@ export default function Lists({ userID }) {
   };
 
   const listData = {
-    user_id: userID,
     name: newListName,
   };
 
@@ -82,7 +81,7 @@ export default function Lists({ userID }) {
 
   useEffect(() => {
     fetchData();
-  }, [userID]); // Refetch data when userID changes
+  }, []);
 
   const navigateToTask = (id) => navigate(`/tasks/${id}`);
   const handleEdit = (e, listId, listName) => {

@@ -2,11 +2,13 @@ from flask import blueprints
 from models import List, Task  # noqa
 from flask import jsonify, request, make_response  # noqa
 from db_init import db  # noqa
+from flask_login import current_user, login_required  # noqa
 
 tasks = blueprints.Blueprint("tasks", __name__)
 
 
 @tasks.route("/GetTasks/<int:list_id>", methods=["GET"])
+@login_required
 def get_tasks(list_id):
     try:
         tasks = Task.query.filter_by(list_id=list_id).all()
@@ -15,7 +17,6 @@ def get_tasks(list_id):
 
         # Create a list of dictionaries containing all attributes of each task
         # and a list of subtasks for each task
-        print("User retrieved all lists from the database")
         return (
             jsonify(
                 {
@@ -36,6 +37,7 @@ def get_tasks(list_id):
 
 
 @tasks.route("/AddTask/<int:list_id>", methods=["POST"])
+@login_required
 def add_task(list_id):
     try:
         data = request.json  # Parse JSON data from the request body
@@ -59,6 +61,7 @@ def add_task(list_id):
 
 
 @tasks.route("/AddSubtasks", methods=["POST"])
+@login_required
 def add_subtask():
     try:
         data = request.json  # Parse JSON data from the request body
@@ -95,6 +98,7 @@ def add_subtask():
 
 
 @tasks.route("/DeleteTask/<int:task_id>", methods=["DELETE"])
+@login_required
 def delete_task(task_id):
     try:
         task_to_delete = Task.query.filter_by(id=task_id).first()
@@ -113,6 +117,7 @@ def delete_task(task_id):
 
 
 @tasks.route("/EditTask/<int:task_id>", methods=["PUT"])
+@login_required
 def edit_task(task_id):
     try:
         data = request.json  # Parse JSON data from the request body
@@ -139,6 +144,7 @@ def edit_task(task_id):
 
 
 @tasks.route("/TaskCompleted/<int:task_id>", methods=["PUT"])
+@login_required
 def task_completed(task_id):
     try:
         task_to_edit = Task.query.filter_by(id=task_id).first()
@@ -151,7 +157,7 @@ def task_completed(task_id):
 
         db.session.commit()
         return (
-            jsonify({"message": "Task completion status toggled successfully!"}),200,)  # noqa
+            jsonify({"message": "Task completion status toggled successfully!"}),200)  # noqa
 
     except Exception as e:
         # Log the exception for debugging
@@ -160,6 +166,7 @@ def task_completed(task_id):
 
 
 @tasks.route("/getUserIdByListId/<int:list_id>", methods=["GET"])
+@login_required
 def get_user_id_by_list_id(list_id):
     try:
         # Assuming that the List model has a 'user_id' attribute
@@ -173,9 +180,10 @@ def get_user_id_by_list_id(list_id):
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
-    
+
 
 @tasks.route("/moveTask/<int:task_id>", methods=["PUT"])
+@login_required
 def move_task_with_subtasks(task_id):
     try:
         new_list_data = request.json
@@ -193,11 +201,17 @@ def move_task_with_subtasks(task_id):
         move_task_recursively(task_to_move, new_list_id)
 
         db.session.commit()
-        return jsonify({"message": "Task and subtasks moved successfully!"}), 200# noqa
+        return (
+            jsonify({"message": "Task and subtasks moved successfully!"}),
+            200,
+        )  # noqa
 
     except Exception as e:
         print(str(e))
-        return jsonify({"error": "An error occurred while moving the task."}), 500# noqa
+        return (
+            jsonify({"error": "An error occurred while moving the task."}),
+            500,
+        )  # noqa
 
 
 def move_task_recursively(task, new_list_id):
