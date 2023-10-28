@@ -23,6 +23,11 @@ nav {
   background-color: #333;
   color: #fff;
   padding: 20px 18px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
 }
 
 .nav-left {
@@ -51,13 +56,30 @@ button:hover {
   background-color: #0056b3;
 }
 
+.btn-grad {
+  background-image: linear-gradient(to right, #085078 0%, #85D8CE 100%);
+  background-size: 200% auto;
+  align-items: center;
+  color: white;
+  border: none;
+  padding:10px 20px;
+  border-radius:5px;
+  text-transform: uppercase;
+  cursor:pointer;
+  transition:background-color 0.3s, color 0.3s;
+}
+
+.btn-grad:hover {
+  background-color: #fff;
+  color: #000;
+}
 
 
 /* footer styling*/
 /* Footer.css */
 
 footer {
-  background-color: #333;
+  background-color:  #333;
   color: #fff;
   text-align: center;
   padding: 10px 0;
@@ -88,3 +110,33 @@ footer {
 }
 
 
+
+/* loader.css */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+.lists-container {
+  background: linear-gradient(to bottom, #f0fff0, #e0ffe0);
+  padding: 20px; /* Adjust padding as needed */
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}

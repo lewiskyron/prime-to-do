@@ -132,3 +132,22 @@ def edit_task(task_id):
         # Log the exception for debugging
         print(str(e))
         return jsonify({"error": "An error occurred."}), 500
+
+@tasks.route("/TaskCompleted/<int:task_id>", methods=["PUT"])
+def task_completed(task_id):
+    try:
+        task_to_edit = Task.query.filter_by(id=task_id).first()
+
+        if task_to_edit is None:
+            return jsonify({"error": "Task not found!"}), 404
+
+        # Toggle the 'completed' status of the task
+        task_to_edit.completed = not task_to_edit.completed
+
+        db.session.commit()
+        return jsonify({"message": "Task completion status toggled successfully!"}), 200
+
+    except Exception as e:
+        # Log the exception for debugging
+        print(str(e))
+        return jsonify({"error": "An error occurred."}), 500

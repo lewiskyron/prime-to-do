@@ -14,6 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   width: "80%",
   margin: `${theme.spacing(4)}px auto`,
+  marginLeft:"1%",
   padding: theme.spacing(2),
   "&:before": {
     display: "none",
@@ -39,7 +40,10 @@ const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange, onAdd}) => {
           style={{
             textDecoration: task.completed ? "line-through" : "none",
             flex: 1,
-            marginLeft: "10px",
+            marginLeft: "0.5%",
+            alignSelf: "center",
+            fontSize: "1.1rem",
+            fontWeight: "400",
           }}
         >
           {task.name}

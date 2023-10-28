@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
-import { IconButton } from "@mui/material";
+import { IconButton, TextField, Button, CircularProgress, Typography  } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { MainContainer, Item } from "./comp-styles";
 import EditDialog from "./EditDialog";
-import ListDialog from "./ListDialog";
 import { useApi } from "../contexts/ApiProvider.jsx";
 
 export default function Lists({ userID }) {
@@ -18,11 +17,13 @@ export default function Lists({ userID }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentList, setCurrentList] = useState(toDoLists);
   const [currentListId, setCurrentListId] = useState(null);
+  const [newListName, setNewListName] = useState(""); // New list name input
 
   const api = useApi();
   const navigate = useNavigate();
 
   const fetchData = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await api.get(`/GetLists?userID=${userID}`); // Filter lists by userID
 
@@ -34,7 +35,7 @@ export default function Lists({ userID }) {
     } catch (error) {
       setError(error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading, whether successful or not
     }
   };
 
@@ -56,14 +57,33 @@ export default function Lists({ userID }) {
     }
   };
 
-  // Effects
+  const listData = {
+    user_id: userID,
+    name: newListName,
+  };
+
+  // Handlers
+  const handleAddList = async () => {
+    try {
+      console.log("Data being sent:", listData);
+      const response = await api.post("/Addlists", listData); // Adjust the endpoint ('/lists') if needed
+
+      if (response.ok) {
+        console.log("List added successfully!", response.body);
+        fetchData(); // Refresh the list of lists
+        setNewListName(""); // Clear the input field
+      } else {
+        console.error("Error adding list:", response.body.message);
+      }
+    } catch (error) {
+      console.error("Failed to add list:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [userID]); // Refetch data when userID changes
 
-  // Handlers
-  const handleAddList = () => CreateDialogOpen(true);
-  const handleCloseDialog = () => CreateDialogOpen(false);
   const navigateToTask = (id) => navigate(`/tasks/${id}`);
   const handleEdit = (e, listId, listName) => {
     e.stopPropagation();
@@ -72,47 +92,94 @@ export default function Lists({ userID }) {
     setDialogOpen(true);
   };
   const closeDialog = () => setDialogOpen(false);
+  const onClose = () => CreateDialogOpen(false);
 
   return (
     <>
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="loader">
+          <CircularProgress />
+        </div>
+      )}
       {error && <p>Error: {error.message}</p>}
       {!loading && !error && (
         <MainContainer>
-          <Stack spacing={2}>
-            {toDoLists.lists &&
-              toDoLists.lists.map((list) => (
-                <Item key={list.id} onClick={() => navigateToTask(list.id)}>
-                  {list.name}
-                  <IconButton
-                    onClick={(e) => handleEdit(e, list.id, list.name)}
-                    size="small"
-                    style={{
-                      position: "absolute",
-                      right: "50px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }}
-                  >
-                    <EditIcon fontSize="inherit" />
-                  </IconButton>
-                  <IconButton
-                    onClick={(e) => handleDelete(e, list.id)}
-                    size="small"
-                    style={{
-                      position: "absolute",
-                      right: "15px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }}
-                  >
-                    <DeleteIcon fontSize="inherit" />
-                  </IconButton>
-                </Item>
-              ))}
-          </Stack>
-          <div className="nav-center">
-            <button onClick={handleAddList}>Add List</button>
+          <Typography variant="h5" style={{ marginBottom: "30px" , marginTop:'40px'}}>
+            My Lists
+          </Typography>
+          <div style={{ marginBottom: "20px", direction:"flex",}}>
+            <Stack spacing={2} style={{marginLeft: '19%'}}>
+              {toDoLists.lists &&
+                toDoLists.lists.map((list) => (
+                  <Item key={list.id} onClick={() => navigateToTask(list.id)}>
+                    {list.name}
+                    <IconButton
+                      onClick={(e) => handleEdit(e, list.id, list.name)}
+                      color="primary"
+                      size="small"
+                      style={{
+                        position: "absolute",
+                        right: "50px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      <EditIcon fontSize="inherit" />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => handleDelete(e, list.id)}
+                      size="small"
+                      color="secondary"
+                      style={{
+                        position: "absolute",
+                        right: "15px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      <DeleteIcon fontSize="inherit" />
+                    </IconButton>
+                  </Item>
+                ))}
+            </Stack>
+          </div>
+          <div
+            className="nav-center"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: "20px",
+              marginRight: "10%", // Adjust the percentage as needed
+            }}
+          >
+            <form
+              onSubmit={handleAddList}
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <TextField
+                type="text"
+                label="Enter a new list name"
+                variant="outlined"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                style={{ marginBottom: "16px", width: "100%", marginRight: "8px" }}
+              />
+              <Button 
+              className="btn-grad"
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ width: "50%", marginBottom: "16px" }}
+              >
+                Add List
+              </Button>
+            </form>
           </div>
         </MainContainer>
       )}
@@ -122,14 +189,6 @@ export default function Lists({ userID }) {
           handleClose={closeDialog}
           fetchData={fetchData}
           listId={currentListId}
-        />
-      )}
-      {isDialogOpen && (
-        <ListDialog
-          open={isDialogOpen}
-          onClose={handleCloseDialog}
-          fetchData={fetchData}
-          user_id={userID}
         />
       )}
     </>

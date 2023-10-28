@@ -23,7 +23,7 @@ export default function Navbar() {
         <div className="nav-right">
           <span className="user-profile"></span>
           {isLoggedIn && (
-            <button onClick={handleLogout}>Logout</button>
+            <button className='btn-grad' onClick={handleLogout}>Logout</button>
           )}
         </div>
       </nav>

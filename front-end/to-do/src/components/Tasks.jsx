@@ -71,9 +71,48 @@ export default function Tasks({ listID }) {
     setNewTaskName(e.target.value);
   };
 
-  const handleCheckboxChange = (taskId, e) => {
+  const handleCheckboxChange = async (taskId, e) => {
     e.stopPropagation();
-  };
+
+    const updateTasksRecursively = async (tasksToUpdate, parentId = null) => {
+      let allSubtasksCompleted = true;
+
+      const updatedTasks = await Promise.all(tasksToUpdate.map(async (task) => {
+        let updatedTask = { ...task };
+
+        // Check if the current task or subtask is the one being interacted with
+        if (task.id === taskId) {
+          updatedTask.completed = !task.completed;
+          await api.put(`/TaskCompleted/${taskId}`, {
+            completed: updatedTask.completed,
+          });
+        }
+
+        // Recursively update subtasks
+        if (task.subtasks && task.subtasks.length > 0) {
+          updatedTask.subtasks = await updateTasksRecursively(task.subtasks, task.id);
+          allSubtasksCompleted = updatedTask.subtasks.every(sub => sub.completed);
+        }
+
+        return updatedTask;
+      }));
+
+      // Automatically mark the parent as completed if all subtasks are completed
+      if (parentId !== null && allSubtasksCompleted) {
+        const parentIndex = updatedTasks.findIndex(task => task.id === parentId);
+        if (parentIndex !== -1) {
+          updatedTasks[parentIndex].completed = true;
+          // Update the parent task completion status in the backend
+          await api.put(`/TaskCompleted/${parentId}`, { completed: true });
+        }
+      }
+
+      return updatedTasks;
+    };
+
+    const updatedTasks = await updateTasksRecursively([...tasks.tasks]);
+    setTasks({ tasks: updatedTasks });
+};
 
   const handleEditClick = async (task, e) => {
     e.stopPropagation();
@@ -144,7 +183,7 @@ export default function Tasks({ listID }) {
 
   return (
     <MainContainer paddingTop={0}>
-      <h1>Tasks Page</h1>
+      <h1 style={{ marginBottom: "4%", marginTop: "4%" }}>Tasks Page</h1>
       <Box
         display="flex"
         justifyContent="center"
@@ -167,6 +206,7 @@ export default function Tasks({ listID }) {
             onChange={handleTaskNameChange}
           />
           <Button
+            className="btn-grad"
             variant="contained"
             color="primary"
             type="submit"

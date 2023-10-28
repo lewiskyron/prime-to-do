@@ -5,14 +5,12 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
-//... rest of your code
-
 
 export const MainContainer = styled(Box)(({ theme }) => ({
-  width: '100%',
-  padding: '5% 5%',
-  backgroundColor: '#f5f5f5',
-  height: '100vh',
+  width: "100%",
+  padding: "5% 5%",
+  background: "linear-gradient(160deg, #ffffff 0%, #ffffff 56%, #80d0c7 77%)",
+  height: "100vh",
 }));
 
 

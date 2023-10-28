@@ -40,10 +40,10 @@ class Task(db.Model):
     name = db.Column(db.String(120), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("task.id"), nullable=True)
     list_id = db.Column(db.Integer, db.ForeignKey("list.id"), nullable=True)
-    subtasks = db.relationship("Task", backref=db.backref("parent", remote_side=[id]))# noqa
+    subtasks = db.relationship("Task", backref=db.backref("parent", remote_side=[id]), cascade="all, delete, delete-orphan")# noqa
     depth = db.Column(db.Integer, nullable=False, default=0)
     completed = db.Column(db.Boolean, nullable=False, default=False)
-
+    
     def calculate_depth(self):
         def calculate_depth_recursive(task):
             if task.parent is None:
