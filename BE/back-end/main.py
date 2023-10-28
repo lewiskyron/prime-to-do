@@ -95,3 +95,6 @@ def edit_list(list_id):
 
     db.session.commit()
     return jsonify({"message": "List updated successfully!"}), 200
+
+
+

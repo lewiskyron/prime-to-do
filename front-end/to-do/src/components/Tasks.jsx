@@ -13,6 +13,7 @@ import TaskAccordion from "./TaskAccordion.jsx"; // Import TaskAccordion compone
 import EditTaskDialog from "./EditTaskDialog.jsx"; // Import EditTaskDialog component
 import DeleteTaskDialog from "./DeleteTaskDialog.jsx"; // Import DeleteTaskDialog component
 import AddSubTaskDialog from "./AddSubTaskDialog.jsx"; // Import AddSubTaskDialog component
+import MoveTaskDialog from "./MoveTaskDialog.jsx"; // Import MoveTaskDialog component
 
 export default function Tasks({ listID }) {
   const [tasks, setTasks] = useState([]);
@@ -22,6 +23,7 @@ export default function Tasks({ listID }) {
   const [isDeleteTaskDialogOpen, setIsDeleteTaskDialogOpen] = useState(false);
   const [isAddSubtaskDialogOpen, setIsAddSubtaskDialogOpen] = useState(false);
   const [parentTaskId, setParentTaskId] = useState(null);
+  const [isMoveTaskDialogOpen, setIsMoveTaskDialogOpen] = useState(false);
 
   const api = useApi();
 
@@ -77,29 +79,38 @@ export default function Tasks({ listID }) {
     const updateTasksRecursively = async (tasksToUpdate, parentId = null) => {
       let allSubtasksCompleted = true;
 
-      const updatedTasks = await Promise.all(tasksToUpdate.map(async (task) => {
-        let updatedTask = { ...task };
+      const updatedTasks = await Promise.all(
+        tasksToUpdate.map(async (task) => {
+          let updatedTask = { ...task };
 
-        // Check if the current task or subtask is the one being interacted with
-        if (task.id === taskId) {
-          updatedTask.completed = !task.completed;
-          await api.put(`/TaskCompleted/${taskId}`, {
-            completed: updatedTask.completed,
-          });
-        }
+          // Check if the current task or subtask is the one being interacted with
+          if (task.id === taskId) {
+            updatedTask.completed = !task.completed;
+            await api.put(`/TaskCompleted/${taskId}`, {
+              completed: updatedTask.completed,
+            });
+          }
 
-        // Recursively update subtasks
-        if (task.subtasks && task.subtasks.length > 0) {
-          updatedTask.subtasks = await updateTasksRecursively(task.subtasks, task.id);
-          allSubtasksCompleted = updatedTask.subtasks.every(sub => sub.completed);
-        }
+          // Recursively update subtasks
+          if (task.subtasks && task.subtasks.length > 0) {
+            updatedTask.subtasks = await updateTasksRecursively(
+              task.subtasks,
+              task.id
+            );
+            allSubtasksCompleted = updatedTask.subtasks.every(
+              (sub) => sub.completed
+            );
+          }
 
-        return updatedTask;
-      }));
+          return updatedTask;
+        })
+      );
 
       // Automatically mark the parent as completed if all subtasks are completed
       if (parentId !== null && allSubtasksCompleted) {
-        const parentIndex = updatedTasks.findIndex(task => task.id === parentId);
+        const parentIndex = updatedTasks.findIndex(
+          (task) => task.id === parentId
+        );
         if (parentIndex !== -1) {
           updatedTasks[parentIndex].completed = true;
           // Update the parent task completion status in the backend
@@ -112,13 +123,24 @@ export default function Tasks({ listID }) {
 
     const updatedTasks = await updateTasksRecursively([...tasks.tasks]);
     setTasks({ tasks: updatedTasks });
-};
+  };
 
   const handleEditClick = async (task, e) => {
     e.stopPropagation();
     setCurrentTask(task);
     setIsEditTaskDialogOpen(true);
   };
+
+  const handleMoveTaskClick = (task) => {
+    setCurrentTask(task);
+    setIsMoveTaskDialogOpen(true);
+  };
+
+
+  const AfterMove = () => {
+    fetchTasks();
+  };
+  
 
   const handleDeleteClick = (task, e) => {
     e.stopPropagation();
@@ -227,6 +249,7 @@ export default function Tasks({ listID }) {
               onDelete={handleDeleteClick}
               onCheckboxChange={handleCheckboxChange}
               onAdd={handleAddSubtaskClick}
+              onMove={handleMoveTaskClick}
             />
           ))}
       {currentTask && (
@@ -243,9 +266,16 @@ export default function Tasks({ listID }) {
             onConfirmDelete={handleConfirmDelete}
             task={currentTask}
           />
+          <MoveTaskDialog
+            open={isMoveTaskDialogOpen}
+            onClose={() => setIsMoveTaskDialogOpen(false)}
+            task={currentTask}
+            listID={listID}
+            api={api}
+            AfterMove={AfterMove}
+          />
         </>
       )}
-
       <AddSubTaskDialog
         open={isAddSubtaskDialogOpen}
         onClose={() => setIsAddSubtaskDialogOpen(false)}

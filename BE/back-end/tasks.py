@@ -1,7 +1,7 @@
 from flask import blueprints
-from models import List, Task # noqa
-from flask import jsonify, request, make_response# noqa
-from db_init import db# noqa
+from models import List, Task  # noqa
+from flask import jsonify, request, make_response  # noqa
+from db_init import db  # noqa
 
 tasks = blueprints.Blueprint("tasks", __name__)
 
@@ -29,15 +29,18 @@ def get_tasks(list_id):
     except Exception as e:
         # Log the exception for debugging
         print(str(e))
-        return make_response(jsonify({"error": "An error occurred while fetching the tasks."}), 500)# noqa
+        return make_response(
+            jsonify({"error": "An error occurred while fetching the tasks."}),
+            500,  # noqa
+        )  # noqa
 
 
 @tasks.route("/AddTask/<int:list_id>", methods=["POST"])
 def add_task(list_id):
     try:
         data = request.json  # Parse JSON data from the request body
-        task_name = data.get("name") 
-        list_id = data.get("list_id")  
+        task_name = data.get("name")
+        list_id = data.get("list_id")
 
         if task_name is None:
             return jsonify({"error": "Task name is required."}), 400
@@ -53,7 +56,7 @@ def add_task(list_id):
         # Log the error message
         print(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
-    
+
 
 @tasks.route("/AddSubtasks", methods=["POST"])
 def add_subtask():
@@ -73,8 +76,9 @@ def add_subtask():
             return jsonify({"error": "Parent task not found."}), 404
 
         # Create and add the subtask
-        subtask = Task(name=subtask_name, list_id=subtask_list_id,
-                       parent_id=parent_id)
+        subtask = Task(
+            name=subtask_name, list_id=subtask_list_id, parent_id=parent_id
+        )  # noqa
         db.session.add(subtask)
         db.session.commit()
 
@@ -88,7 +92,7 @@ def add_subtask():
         # Handle any exceptions (e.g., JSON parsing errors)
         print(f"An error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
-    
+
 
 @tasks.route("/DeleteTask/<int:task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -106,7 +110,7 @@ def delete_task(task_id):
         # Log the exception for debugging
         print(str(e))
         return jsonify({"error": "An error occurred."}), 500
-    
+
 
 @tasks.route("/EditTask/<int:task_id>", methods=["PUT"])
 def edit_task(task_id):
@@ -133,6 +137,7 @@ def edit_task(task_id):
         print(str(e))
         return jsonify({"error": "An error occurred."}), 500
 
+
 @tasks.route("/TaskCompleted/<int:task_id>", methods=["PUT"])
 def task_completed(task_id):
     try:
@@ -145,9 +150,57 @@ def task_completed(task_id):
         task_to_edit.completed = not task_to_edit.completed
 
         db.session.commit()
-        return jsonify({"message": "Task completion status toggled successfully!"}), 200
+        return (
+            jsonify({"message": "Task completion status toggled successfully!"}),200,)  # noqa
 
     except Exception as e:
         # Log the exception for debugging
         print(str(e))
         return jsonify({"error": "An error occurred."}), 500
+
+
+@tasks.route("/getUserIdByListId/<int:list_id>", methods=["GET"])
+def get_user_id_by_list_id(list_id):
+    try:
+        # Assuming that the List model has a 'user_id' attribute
+        list = List.query.get(list_id)
+        if list is None:
+            return jsonify({"error": "List not found!"}), 404
+
+        user_id = list.user_id
+        return jsonify({"userId": user_id}), 200
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred."}), 500
+    
+
+@tasks.route("/moveTask/<int:task_id>", methods=["PUT"])
+def move_task_with_subtasks(task_id):
+    try:
+        new_list_data = request.json
+        new_list_id = new_list_data.get("new_list_id")
+
+        if new_list_id is None:
+            return jsonify({"error": "New list ID is required."}), 400
+
+        # Retrieve the task to be moved
+        task_to_move = Task.query.get(task_id)
+        if task_to_move is None:
+            return jsonify({"error": "Task not found."}), 404
+
+        # Update the list_id of the task and its subtasks, if any
+        move_task_recursively(task_to_move, new_list_id)
+
+        db.session.commit()
+        return jsonify({"message": "Task and subtasks moved successfully!"}), 200# noqa
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": "An error occurred while moving the task."}), 500# noqa
+
+
+def move_task_recursively(task, new_list_id):
+    task.list_id = new_list_id
+    for subtask in task.subtasks:
+        move_task_recursively(subtask, new_list_id)

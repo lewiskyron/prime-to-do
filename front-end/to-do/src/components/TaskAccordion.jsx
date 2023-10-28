@@ -10,6 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   width: "80%",
@@ -24,7 +25,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
   },
 }));
 
-const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange, onAdd}) => {
+const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange, onAdd, onMove}) => {
   return (
     <StyledAccordion>
       <AccordionSummary
@@ -65,6 +66,19 @@ const TaskAccordion = ({ task, onEdit, onDelete, onCheckboxChange, onAdd}) => {
         >
           <EditIcon />
         </IconButton>
+
+        {!task.parent_id && (
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              onMove(task);
+            }}
+            color="primary"
+            aria-label="Move Task"
+          >
+            <ArrowForwardIcon />
+          </IconButton>
+        )}
 
         <IconButton
           onClick={(e) => onDelete(task, e)}
